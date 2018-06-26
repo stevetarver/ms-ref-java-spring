@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 @RequestMapping(
-        value = "/v3/starter/java/contacts",
+        value = "/reference/java/contacts",
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContactsController {
 

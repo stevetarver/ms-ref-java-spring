@@ -1,4 +1,4 @@
-## Overview
+## Microservice reference: java / spring / maven
 
 This repo provides a reference cloud-native microservice implementing best practices described in [my blog](http://stevetarver.github.io/):
 

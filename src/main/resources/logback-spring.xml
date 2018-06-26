@@ -34,11 +34,11 @@
                         <pattern>
                             {
                             "logServiceType":     "demo",
-                            "logServiceName":     "pl-cloud-starter-java",
+                            "logServiceName":     "ms-ref-java-spring",
                             "logServiceVersion":  "${SERVICE_VERSION}",
                             "logServiceInstance": "${HOSTNAME}",
 
-                            "logGitHubRepoName": "pl-cloud-starter-java",
+                            "logGitHubRepoName": "ms-ref-java-spring",
                             "logThreadId":       "%thread",
                             "logClass":          "%class{32}",
                             "logMethod":         "%method",
