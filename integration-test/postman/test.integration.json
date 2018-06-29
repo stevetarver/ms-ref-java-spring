@@ -1,0 +1,963 @@
+{
+	"info": {
+		"_postman_id": "a35a90c5-6665-44cd-a8cb-b8f390af9337",
+		"name": "ms-ref-java-spring integration test",
+		"description": "Provides exhaustive api exercise with validation. May be run in a loop for load testing.\n\nNOTES:\n* Can only be run against ops endpoint because of readiness, etc. test\n* Requires selecting an environment appropriate for the target\n* Requires a fresh mongo-sample-data container",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. readiness",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "11bbc349-1b01-4fa9-9ec0-d326b786cf78",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "e0e686fa-faa8-42bc-bb20-f0e846542087",
+						"type": "text/javascript",
+						"exec": [
+							"console.log('Verifying service is ready');",
+							"",
+							"// Get the URL for this step - allows us to copy/paste this code into any step",
+							"var url = request['url'].replace('{{host}}', postman.getEnvironmentVariable('host'));",
+							"var retryDelay = 10000;",
+							"var retryLimit = 10;",
+							"",
+							"function isServiceReady(retryCount) {",
+							"    pm.sendRequest(url, function (err, response) {",
+							"        // Service endpoint is not up yet - any kind of connection error",
+							"        var notUp = (null !== err);",
+							"        // Service is up, but still initializing or waiting on upstream partners",
+							"        // NOTE: there is always a response object, but .code only exists if we connected",
+							"        var notReady = (!response.hasOwnProperty('code') || response.code !== 200);",
+							"",
+							"        if(notUp || notReady) {",
+							"            if (retryCount < retryLimit) {",
+							"                if(notUp) {",
+							"                    console.log('Service is down. Retrying in ' + retryDelay + 'ms');",
+							"                } else {",
+							"                    console.log('Service is not yet ready. Retrying in ' + retryDelay + 'ms');",
+							"                }",
+							"                // If not ready, retry this function after retryDelay",
+							"                setTimeout(function() {",
+							"                    isServiceReady(++retryCount);",
+							"                }, retryDelay);",
+							"            } else {",
+							"                console.log('Retry limit reached, giving up.');",
+							"                postman.setNextRequest(null);",
+							"            }",
+							"        }",
+							"    });",
+							"}",
+							"",
+							"isServiceReady(1);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/healthz/readiness",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"healthz",
+						"readiness"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. liveness",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2afd55b2-bdbe-41f5-9e9d-93d7b4e578b4",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "960a63d5-c296-46ec-bd0c-9c6cb44ec395",
+						"type": "text/javascript",
+						"exec": [
+							"console.log('Verifying service is ready');",
+							"",
+							"// Get the URL for this step - allows us to copy/paste this code into any step",
+							"var url = request['url'].replace('{{host}}', postman.getEnvironmentVariable('host'));",
+							"var retryDelay = 10000;",
+							"var retryLimit = 8;",
+							"",
+							"function isServiceReady(retryCount) {",
+							"    pm.sendRequest(url, function (err, response) {",
+							"        // Service endpoint is not up yet - any kind of connection error",
+							"        var notUp = (null !== err);",
+							"        // Service is up, but still initializing or waiting on upstream partners",
+							"        // NOTE: there is always a response object, but .code only exists if we connected",
+							"        var notReady = (!response.hasOwnProperty('code') || response.code !== 200);",
+							"",
+							"        if(notUp || notReady) {",
+							"            if (retryCount < retryLimit) {",
+							"                if(notUp) {",
+							"                    console.log('Service is down. Retrying in ' + retryDelay + 'ms');",
+							"                } else {",
+							"                    console.log('Service is not yet ready. Retrying in ' + retryDelay + 'ms');",
+							"                }",
+							"                // If not ready, retry this function after retryDelay",
+							"                setTimeout(function() {",
+							"                    isServiceReady(++retryCount);",
+							"                }, retryDelay);",
+							"            } else {",
+							"                console.log('Retry limit reached, giving up.');",
+							"                postman.setNextRequest(null);",
+							"            }",
+							"        }",
+							"    });",
+							"}",
+							"",
+							"isServiceReady(1);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/healthz/liveness",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"healthz",
+						"liveness"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. ping",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b5edcddd-ab60-44ec-9ae8-cebb8fb25c7e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9aa92c5d-970a-4a0e-be21-f1d1e5a5e26b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/healthz/ping",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"healthz",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. actuator",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0d24b22e-6fd9-43a6-b00f-5bc3c982d13a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 300ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});",
+							"",
+							"pm.test(\"Content contains non-empty list of links\", function () {",
+							"    pm.expect(pm.response.json()).to.have.a.property('links');",
+							"    pm.expect(pm.response.json().links).to.be.an('array').that.is.not.empty;",
+							"    pm.expect(pm.response.json().links[0]).to.have.all.keys('rel', 'href');",
+							"});",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3029a874-9434-4e16-8669-ae351d0f0d96",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/actuator",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"actuator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. prometheus",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c867969b-6814-48ed-b28b-d35f7b5b2dda",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 300ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});",
+							"",
+							"pm.test(\"Content is text\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include('text/plain');",
+							"});",
+							"",
+							"pm.test(\"Content is sane\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"# HELP\");",
+							"    pm.expect(pm.response.text()).to.include(\"# TYPE\");",
+							"    pm.expect(pm.response.text()).to.include(\"process_cpu_seconds_total\");",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "80508279-2c4e-4194-8381-4301487e4207",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/prometheus",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"prometheus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. get all contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bcc33200-e7dd-429d-b489-57c7d6a28759",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 800ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(800);",
+							"});",
+							"",
+							"postman.setEnvironmentVariable(\"initial_collection_size\", pm.response.json().length);",
+							"",
+							"console.log(\"Initial collection size: \" + pm.response.json().length);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. create a contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "07ef246c-1ec1-49e6-9232-ba7dd0f4a390",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 300ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);",
+							"});",
+							"",
+							"pm.test(\"Response contains a single result\", function () {",
+							"    pm.expect(pm.response.json()).to.not.be.a('array');",
+							"});",
+							"",
+							"pm.test(\"Returned contact matches request\", function () {",
+							"    var orig = JSON.parse(postman.getEnvironmentVariable(\"create_contact_info\"));",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.firstName).to.equal(orig.firstName);",
+							"    pm.expect(resp.lastName).to.equal(orig.lastName);",
+							"    pm.expect(resp.companyName).to.equal(orig.companyName);",
+							"    pm.expect(resp.address).to.equal(orig.address);",
+							"    pm.expect(resp.city).to.equal(orig.city);",
+							"    pm.expect(resp.county).to.equal(orig.county);",
+							"    pm.expect(resp.state).to.equal(orig.state);",
+							"    pm.expect(resp.zip).to.equal(orig.zip);",
+							"    pm.expect(resp.phone1).to.equal(orig.phone1);",
+							"    pm.expect(resp.phone2).to.equal(orig.phone2);",
+							"    pm.expect(resp.email).to.equal(orig.email);",
+							"    pm.expect(resp.website).to.equal(orig.website);",
+							"});",
+							"",
+							"",
+							"postman.setEnvironmentVariable(\"created_contact_id\", pm.response.json().id);",
+							"",
+							"console.log(\"Created contact: \" + pm.response.json().id);"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "88c625ca-8268-402f-a4a7-9efe1f9b4975",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable(\"create_contact_info\", ",
+							"`{",
+							"    \"firstName\": \"Leroy\",",
+							"    \"lastName\": \"Jenkins\",",
+							"    \"companyName\": \"Docker Publishing Company\",",
+							"    \"address\": \"1 Solutions Parkway\",",
+							"    \"city\": \"Town & Country\",",
+							"    \"county\": \"Chesterfield\",",
+							"    \"state\": \"MO\",",
+							"    \"zip\": \"63011\",",
+							"    \"phone1\": \"855-226-0709\",",
+							"    \"phone2\": \"888-638-6771\",",
+							"    \"email\": \"leroy.jenkins@makara.io\",",
+							"    \"website\": \"http://www.makara.io\"",
+							"}`);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{create_contact_info}}"
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. get the created contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0c8863d3-076c-444a-bc3d-15269cafba32",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 250ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(250);",
+							"});",
+							"",
+							"pm.test(\"Created contact matches request\", function () {",
+							"    var orig = JSON.parse(postman.getEnvironmentVariable(\"create_contact_info\"));",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.firstName).to.equal(orig.firstName);",
+							"    pm.expect(resp.lastName).to.equal(orig.lastName);",
+							"    pm.expect(resp.companyName).to.equal(orig.companyName);",
+							"    pm.expect(resp.address).to.equal(orig.address);",
+							"    pm.expect(resp.city).to.equal(orig.city);",
+							"    pm.expect(resp.county).to.equal(orig.county);",
+							"    pm.expect(resp.state).to.equal(orig.state);",
+							"    pm.expect(resp.zip).to.equal(orig.zip);",
+							"    pm.expect(resp.phone1).to.equal(orig.phone1);",
+							"    pm.expect(resp.phone2).to.equal(orig.phone2);",
+							"    pm.expect(resp.email).to.equal(orig.email);",
+							"    pm.expect(resp.website).to.equal(orig.website);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Leroy\",\n    \"lastName\": \"Jenkins\",\n    \"companyName\": \"Docker Publishing Company\",\n    \"address\": \"1 Solutions Parkway\",\n    \"city\": \"Town & Country\",\n    \"county\": \"Chesterfield\",\n    \"state\": \"MO\",\n    \"zip\": \"63011\",\n    \"phone1\": \"855-226-0709\",\n    \"phone2\": \"888-638-6771\",\n    \"email\": \"leroy.jenkins@makara.io\",\n    \"website\": \"http://www.makara.io\"\n}\n"
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts/{{created_contact_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts",
+						"{{created_contact_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. update the created contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0760f6f1-9fde-4bee-8e0e-fc6aa3481f66",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 250ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(250);",
+							"});",
+							"",
+							"pm.test(\"Contact patch applied correctly\", function () {",
+							"    var orig = JSON.parse(postman.getEnvironmentVariable(\"create_contact_info\"));",
+							"    var patch = JSON.parse(postman.getEnvironmentVariable(\"update_contact_info\"));",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.firstName).to.equal(patch.firstName);",
+							"    pm.expect(resp.lastName).to.equal(orig.lastName);",
+							"    pm.expect(resp.companyName).to.equal(patch.companyName);",
+							"    pm.expect(resp.address).to.equal(orig.address);",
+							"    pm.expect(resp.city).to.equal(orig.city);",
+							"    pm.expect(resp.county).to.equal(orig.county);",
+							"    pm.expect(resp.state).to.equal(orig.state);",
+							"    pm.expect(resp.zip).to.equal(orig.zip);",
+							"    pm.expect(resp.phone1).to.equal(orig.phone1);",
+							"    pm.expect(resp.phone2).to.equal(orig.phone2);",
+							"    pm.expect(resp.email).to.equal(patch.email);",
+							"    pm.expect(resp.website).to.equal(orig.website);",
+							"});",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "849e057c-ada0-404b-9d0d-51bb441a725f",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable(\"update_contact_info\", ",
+							"`{",
+							"    \"firstName\": \"Lester\",",
+							"    \"companyName\": \"Docker Composing Company\",",
+							"    \"email\": \"lester.jenkins@makara.io\"",
+							"}`);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{update_contact_info}}"
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts/{{created_contact_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts",
+						"{{created_contact_id}}"
+					]
+				},
+				"description": "Modify a couple of contact attributes"
+			},
+			"response": []
+		},
+		{
+			"name": "10. replace the created contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "45571eba-bf5d-40ac-b733-141ae382a10c",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							"pm.test(\"Replaced contact matches request\", function () {",
+							"    var orig = JSON.parse(postman.getEnvironmentVariable(\"replace_contact_info\"));",
+							"    var resp = pm.response.json();",
+							"    pm.expect(resp.firstName).to.equal(orig.firstName);",
+							"    pm.expect(resp.lastName).to.equal(orig.lastName);",
+							"    pm.expect(resp.companyName).to.equal(orig.companyName);",
+							"    pm.expect(resp.address).to.equal(orig.address);",
+							"    pm.expect(resp.city).to.equal(orig.city);",
+							"    pm.expect(resp.county).to.equal(orig.county);",
+							"    pm.expect(resp.state).to.equal(orig.state);",
+							"    pm.expect(resp.zip).to.equal(orig.zip);",
+							"    pm.expect(resp.phone1).to.equal(orig.phone1);",
+							"    pm.expect(resp.phone2).to.equal(orig.phone2);",
+							"    pm.expect(resp.email).to.equal(orig.email);",
+							"    pm.expect(resp.website).to.equal(orig.website);",
+							"});"
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "359dfda0-2fe3-42ce-9e82-c9448b9b641d",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable(\"replace_contact_info\", ",
+							"`{",
+							"    \"firstName\": \"Buster\",",
+							"    \"lastName\": \"Hamilton\",",
+							"    \"companyName\": \"CoreOS Rocket Manufacturing\",",
+							"    \"address\": \"101 New Montgomery\",",
+							"    \"city\": \"San Francisco\",",
+							"    \"county\": \"Los Angeles\",",
+							"    \"state\": \"CA\",",
+							"    \"zip\": \"94105\",",
+							"    \"phone1\": \"(800) 774-3507\",",
+							"    \"phone2\": \"(800) 774-3508\",",
+							"    \"email\": \"bhamilton@coreos.com\",",
+							"    \"website\": \"https://coreos.com\"",
+							"}`);",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{replace_contact_info}}"
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts/{{created_contact_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts",
+						"{{created_contact_id}}"
+					]
+				},
+				"description": "Replace an existing contact with new data"
+			},
+			"response": []
+		},
+		{
+			"name": "11. delete the created contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "72f84c82-583b-4633-8e96-160a620d6d8e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 250ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(250);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts/{{created_contact_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts",
+						"{{created_contact_id}}"
+					]
+				},
+				"description": "Delete our created contact"
+			},
+			"response": []
+		},
+		{
+			"name": "12. get the deleted contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "64b1a90a-a49a-440d-8a39-8c9146bfe06e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Contact is not found\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an errors list\", function () {",
+							"    pm.expect(pm.response.json().errors).to.be.a('array');",
+							"});",
+							"",
+							"pm.test(\"Response identifies contact by id\", function() {",
+							"    var contactId = postman.getEnvironmentVariable(\"created_contact_id\");",
+							"    pm.expect(pm.response.text()).to.include(contactId);",
+							"});",
+							"",
+							"pm.test(\"Response error object is valid json:api\", function() {",
+							"    var data = pm.response.json().errors[0];",
+							"    pm.expect(data.title).to.equal(\"Not Found\");",
+							"    pm.expect(data.detail).to.include(\"There is no item\");",
+							"    pm.expect(data.status).to.equal(\"404\");",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\": \"Leroy\",\n    \"lastName\": \"Jenkins\",\n    \"companyName\": \"Docker Publishing Company\",\n    \"address\": \"1 Solutions Parkway\",\n    \"city\": \"Town & Country\",\n    \"county\": \"Chesterfield\",\n    \"state\": \"MO\",\n    \"zip\": \"63011\",\n    \"phone1\": \"855-226-0709\",\n    \"phone2\": \"888-638-6771\",\n    \"email\": \"leroy.jenkins@makara.io\",\n    \"website\": \"http://www.ctl.io\"\n}\n"
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts/{{created_contact_id}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts",
+						"{{created_contact_id}}"
+					]
+				},
+				"description": "Get the deleted contact to ensure it has been deleted"
+			},
+			"response": []
+		},
+		{
+			"name": "13. get all contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c6225fc5-86d8-4038-b971-5afc4177d1f0",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 800ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(800);",
+							"});",
+							"",
+							"pm.test(\"Contacts collection returned to initial size after delete\", function () {",
+							"    var initialSize = +(postman.getEnvironmentVariable(\"initial_collection_size\"));",
+							"    pm.expect(pm.response.json().length).to.equal(initialSize);",
+							"});",
+							"",
+							"console.log(\"Cleaning up environment for next run\");",
+							"postman.clearEnvironmentVariable(\"create_contact_info\");",
+							"postman.clearEnvironmentVariable(\"created_contact_id\");",
+							"postman.clearEnvironmentVariable(\"replace_contact_info\");",
+							"postman.clearEnvironmentVariable(\"update_contact_info\");",
+							"postman.clearEnvironmentVariable(\"initial_collection_size\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/v3/starter/java/contacts",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"v3",
+						"starter",
+						"java",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
