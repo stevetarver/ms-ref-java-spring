@@ -1,4 +1,5 @@
-@Library('stevetarver/jenkins-pipe@master') _
+// TODO: is this necessary if we have registered the shared library globally
+@Library('jenkins-pipe@master') _
 
 containerPipeline([
     // Configure the environment available in the build pipeline
