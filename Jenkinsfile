@@ -1,4 +1,4 @@
-@Library('jenkins-pipe@master') _
+@Library('stevetarver/jenkins-pipe@master') _
 
 containerPipeline([
     // Configure the environment available in the build pipeline
