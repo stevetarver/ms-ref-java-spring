@@ -1,4 +1,4 @@
-@Library('pl-jenkins-lib@master') _
+@Library('jenkins-pipe@master') _
 
 containerPipeline([
     // Configure the environment available in the build pipeline
@@ -8,8 +8,8 @@ containerPipeline([
     // Configure the build pipeline
     pipeline: [
         dockerGroup: 'stevetarver',
-        slackChannel: 'kong-build',
-        slackCredentialId: 'kong-build-slack-token',
+        slackChannel: 'tarver-build',
+        slackCredentialId: 'tarver-build-slack-token',
         test: [
             unitTestResults: 'target/surefire-reports/*.xml',
             codeCoverageHtmlDir: 'target/site/clover'
@@ -21,7 +21,7 @@ containerPipeline([
         test: "mvn -Dspring.profiles.active=dev clean clover:setup test clover:aggregate clover:clover",
         package: "./jenkins/scripts/package.sh",
         deploy: "./jenkins/scripts/deploy.sh",
-        integrationTest: "./integration-test/run.sh -t integration -e lb1.ops",
+        integrationTest: "./integration-test/run.sh -t integration -e dev.ops",
         prodDeploy: "./jenkins/scripts/prod_deploy.sh",
         prodTest: "./integration-test/run.sh -t integration -e prod.ops"
     ]
