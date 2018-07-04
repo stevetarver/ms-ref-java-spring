@@ -30,7 +30,6 @@ containerPipeline([
     ],
     // Identify scripts to run for each stage of the build pipeline
     stageCommands: [
-        build: "mvn -Dspring.profiles.active=dev clean compile",
         test: "mvn -Dspring.profiles.active=dev clean clover:setup test clover:aggregate clover:clover",
         package: "./jenkins/scripts/package.sh",
         deploy: "./jenkins/scripts/deploy.sh",
