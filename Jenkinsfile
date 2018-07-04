@@ -1,7 +1,7 @@
 // Leaving this declaration in place allows us to use different versions in
 // different projects as well as identify the exact version that was used.
 // Otherwise, we will always use the version registered in Jenkins globally.
-@Library('jenkins-pipe@master') _
+//@Library('jenkins-pipe@master') _
 
 containerPipeline([
     // Configure the environment available in the build pipeline
@@ -11,7 +11,7 @@ containerPipeline([
     // Configure the build pipeline
     pipeline: [
         dockerGroup: 'stevetarver',
-        //slackWorkspace: 'makaradsigngroup',
+        //slackWorkspace: 'makaradesigngroup',
         //slackChannel: 'build',
         //slackCredentialId: 'makaradesigngroup-build-slack-token',
         test: [
@@ -25,7 +25,8 @@ containerPipeline([
         test: "mvn -Dspring.profiles.active=dev clean clover:setup test clover:aggregate clover:clover",
         package: "./jenkins/scripts/package.sh",
         deploy: "./jenkins/scripts/deploy.sh",
-        integrationTest: "./integration-test/run.sh -t integration -e dev.ops",
+        integrationTest: "echo 'please implement me",
+        //integrationTest: "./integration-test/run.sh -t integration -e dev.ops",
         prodDeploy: "./jenkins/scripts/prod_deploy.sh",
         prodTest: "./integration-test/run.sh -t integration -e prod.ops"
     ]
