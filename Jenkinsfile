@@ -1,4 +1,6 @@
-// TODO: is this necessary if we have registered the shared library globally
+// Leaving this declaration in place allows us to use different versions in
+// different projects as well as identify the exact version that was used.
+// Otherwise, we will always use the version registered in Jenkins globally.
 @Library('jenkins-pipe@master') _
 
 containerPipeline([
@@ -9,8 +11,9 @@ containerPipeline([
     // Configure the build pipeline
     pipeline: [
         dockerGroup: 'stevetarver',
-        slackChannel: 'tarver-build',
-        slackCredentialId: 'tarver-build-slack-token',
+        //slackWorkspace: 'makaradesigngroup',
+        //slackChannel: 'build',
+        //slackCredentialId: 'makaradesigngroup-build-slack-token',
         test: [
             unitTestResults: 'target/surefire-reports/*.xml',
             codeCoverageHtmlDir: 'target/site/clover'
