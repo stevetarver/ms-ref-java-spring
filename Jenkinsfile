@@ -1,7 +1,16 @@
-// Leaving this declaration in place allows us to use different versions in
-// different projects as well as identify the exact version that was used.
-// Otherwise, we will always use the version registered in Jenkins globally.
-//@Library('jenkins-pipe@master') _
+/**
+ * Import our Jenkins shared library and execute the containerPipeline.
+ *
+ * The containerPipeline execuate appropriate stages for the executing
+ * environment.
+ *
+ * This library is registered in Jenkins as a global shared library. You
+ * can specify library branch - @master is incubator, something like
+ * @release-1.0 will have a stable interface and receive new functionality
+ * that does not break that interface.
+ * More details at: https://github.com/stevetarver/jenkins-pipe
+ **/
+@Library('jenkins-pipe@master') _
 
 containerPipeline([
     // Configure the environment available in the build pipeline
