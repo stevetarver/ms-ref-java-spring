@@ -11,7 +11,7 @@ containerPipeline([
     // Configure the build pipeline
     pipeline: [
         dockerGroup: 'stevetarver',
-        //slackWorkspace: 'makaradesigngroup',
+        //slackWorkspace: 'makaradsigngroup',
         //slackChannel: 'build',
         //slackCredentialId: 'makaradesigngroup-build-slack-token',
         test: [
