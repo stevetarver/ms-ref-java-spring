@@ -1,0 +1,107 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      nodeSelector:
+        node-type: pod
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.service.image.nameTag }}
+        imagePullPolicy: {{ .Values.service.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        env:
+        # for logging the image version
+        - name: SERVICE_VERSION
+          value: {{ .Values.service.version }}
+        # Example of pulling a secret into an env var - not actually used
+#        - name: DB_ACCOUNT
+#          valueFrom:
+#            secretKeyRef:
+#              name: ms-ref-java-spring-db-credentials
+#              key: dbAccount
+#        - name: DB_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: ms-ref-java-spring-db-credentials
+#              key: dbPassword
+        livenessProbe:
+          httpGet:
+            path: /healthz/liveness
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /healthz/readiness
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 15
+          timeoutSeconds: 5
+          periodSeconds: 15
+        # Example of providing facts & secrets through Jenkins config - not actually used
+#        volumeMounts:
+#        - name: {{ .Chart.Name }}
+#          mountPath: "/config"
+#          readOnly: true
+#        - name: secrets
+#          mountPath: "/secrets"
+#          readOnly: true
+        resources:
+          # TODO: fill this in after load testing
+
+      # See https://github.com/kubernetes/charts/blob/master/stable/mongodb/templates/deployment.yaml
+      - name: mongo-sample-data
+        image: {{ .Values.datastore.image.nameTag }}
+        imagePullPolicy: {{ .Values.datastore.image.pullPolicy }}
+        ports:
+        - name: mongodb
+          containerPort: {{ .Values.datastore.internalPort }}
+        livenessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          periodSeconds: 15
+        readinessProbe:
+          exec:
+            command:
+            - mongo
+            - --eval
+            - "db.adminCommand('ping')"
+          initialDelaySeconds: 40
+          timeoutSeconds: 5
+          periodSeconds: 15
+        # NOTE: the data we store is small and ephemeral - we do not use a docker volume
+        resources:
+          # TODO: fill this in after load testing
+
+      # Example of providing facts & secrets through Jenkins config - not actually used
+#      volumes:
+#      - name: {{ .Chart.Name }}
+#        configMap:
+#          name: {{ .Chart.Name }}
+#          items:
+#          - key: application.properties
+#            path: application.properties
+#      - name: secrets
+#        secret:
+#          secretName: {{ .Chart.Name }}
+
+      # Provide credentials for pulling our images from a private registry
+      # Not currently needed - using a public registry
+#      imagePullSecrets:
+#      - name: docker-registry-credentials
+

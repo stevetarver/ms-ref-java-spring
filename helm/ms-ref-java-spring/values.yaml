@@ -1,0 +1,22 @@
+---
+replicaCount: 1
+
+service:
+  image:
+    pullPolicy: IfNotPresent
+    nameTag: "MUST-BE-DEFINED-DURING-INSTALL"
+  internalPort: 8080
+  version: "MUST-BE-DEFINED-DURING-INSTALL"
+
+datastore:
+  image:
+    pullPolicy: IfNotPresent
+    nameTag: stevetarver/mongo-sample-data:3.4-r0
+  internalPort: 27017
+
+# minikube (local testing) support
+minikube:
+  # use --set minikube.enabled=true during minikube helm install
+  # see integration-test/local/minikube_install.sh
+  enabled: false
+  nodePort: 30095
