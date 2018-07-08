@@ -33,7 +33,7 @@ containerPipeline([
         test: "mvn -Dspring.profiles.active=dev clean clover:setup test clover:aggregate clover:clover",
         package: "./jenkins/scripts/package.sh",
         deploy: "./jenkins/scripts/deploy.sh",
-        integrationTest: "echo 'please implement me",
+        integrationTest: "echo 'please implement me'",
         //integrationTest: "./integration-test/run.sh -t integration -e dev.ops",
         prodDeploy: "./jenkins/scripts/prod_deploy.sh",
         prodTest: "./integration-test/run.sh -t integration -e prod.ops"
