@@ -12,7 +12,9 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       nodeSelector:
+        {{- if .Values.minikube.enabled }}
         node-type: pod
+        {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.service.image.nameTag }}
