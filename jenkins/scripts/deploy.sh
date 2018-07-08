@@ -11,9 +11,10 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     DOMAIN='makara.dom'
     NAMESPACE='chaos'
     MINIKUBE_ENABLED=false
-    if [[ "${K8S_CLUSTER_TYPE}" == 'minikube' ]]; then
+    if [[ "${K8S_CLUSTER_TYPE}" == "minikube" ]]; then
         MINIKUBE_ENABLED=true
     fi
+    echo "${MINIKUBE_ENABLED}"
 
     echo "********** Deploying ${DOCKER_DEPLOY_IMAGE_NAMETAG} to ${NAMESPACE} **********"
 
