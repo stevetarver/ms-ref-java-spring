@@ -13,14 +13,17 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     case ${TARGET_ENV} in
         'dev')
             NAMESPACE='chaos'
+            MINIKUBE_NODEPORT=30095
             ;;
 
         'pre-prod')
             NAMESPACE='pre-prod'
+            MINIKUBE_NODEPORT=30096
             ;;
 
         'prod')
             NAMESPACE='prod'
+            MINIKUBE_NODEPORT=30096
             ;;
 
             *)
@@ -43,6 +46,7 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
         --set ingressLocations=${INGRESS}                           \
         --set internalDomainName=${DOMAIN}                          \
         --set minikube.enabled=${MINIKUBE_ENABLED}                  \
+        --set minikube.nodePort=${MINIKUBE_NODEPORT}                \
         ${DOCKER_PROJECT}                                           \
         ./helm/ms-ref-java-spring
 )
