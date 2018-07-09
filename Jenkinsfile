@@ -35,7 +35,8 @@ containerPipeline([
         deploy: "./jenkins/scripts/deploy.sh",
         integrationTest: "echo 'please implement me'",
         //integrationTest: "./integration-test/run.sh -t integration -e dev.ops",
-        prodDeploy: "./jenkins/scripts/prod_deploy.sh",
-        prodTest: "./integration-test/run.sh -t integration -e prod.ops"
+        prodDeploy: "./jenkins/scripts/deploy.sh",
+        prodTest: "echo 'please implement me'",
+        //prodTest: "./integration-test/run.sh -t integration -e prod.ops",
     ]
 ])
