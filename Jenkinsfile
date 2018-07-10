@@ -19,7 +19,7 @@ containerPipeline([
     ],
     // Configure the build pipeline
     pipeline: [
-        skipCanaryStage; true,
+        skipCanaryStage: true,
         dockerGroup: 'stevetarver',
         //slackWorkspace: 'makaradesigngroup',
         //slackChannel: 'build',
