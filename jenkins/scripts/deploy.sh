@@ -9,21 +9,19 @@ MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
     INGRESS='{us-east}'
     DOMAIN='makara.dom'
+    MINIKUBE_NODEPORT=30095
 
     case ${TARGET_ENV} in
         'dev')
             NAMESPACE='chaos'
-            MINIKUBE_NODEPORT=30095
             ;;
 
         'pre-prod')
             NAMESPACE='pre-prod'
-            MINIKUBE_NODEPORT=30096
             ;;
 
         'prod')
             NAMESPACE='prod'
-            MINIKUBE_NODEPORT=30096
             ;;
 
             *)
